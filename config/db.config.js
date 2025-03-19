@@ -10,12 +10,7 @@ const connectDB = async () => {
   }
 
   try {
-    const conn = await mongoose.connect(process.env.MONGO_DB_URL, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-      connectTimeoutMS: 30000, // 30 seconds
-      socketTimeoutMS: 45000,
-    });
+    const conn = await mongoose.connect(process.env.MONGO_DB_URL);
 
     console.log("MongoDB Connected");
     cachedConnection = conn.connection;

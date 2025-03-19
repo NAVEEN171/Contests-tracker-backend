@@ -199,7 +199,8 @@ const getContests = async (req, res, next) => {
       },
     });
 
-    const results = await Contests.aggregate(pipeline);
+    let results = await Contests.aggregate(pipeline);
+    results = await results.toArray();
 
     if (results.length > 0) {
       let maxPages = results[0].totalCount;

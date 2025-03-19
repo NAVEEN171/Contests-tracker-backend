@@ -7,8 +7,6 @@ app.use(bodyParser.json());
 const apiRoutes = require("./routes/api");
 const { getConnection, connectDB } = require("./config/db.config");
 
-app.use(cors());
-
 app.get("/", (req, res) => {
   res.json("deployed succesfully");
 });

@@ -7,10 +7,6 @@ app.use(bodyParser.json());
 const apiRoutes = require("./routes/api");
 const { getConnection, connectDB } = require("./config/db.config");
 
-app.get("/", (req, res) => {
-  res.json("deployed succesfully");
-});
-
 app.use(
   cors({
     origin: ["http://localhost:5173", "https://contests-tracker-nu.vercel.app"],
@@ -19,6 +15,10 @@ app.use(
     credentials: true,
   })
 );
+
+app.get("/", (req, res) => {
+  res.json("deployed succesfully");
+});
 
 app.use("/api", apiRoutes);
 

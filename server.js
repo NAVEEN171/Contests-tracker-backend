@@ -1,10 +1,8 @@
 const express = require("express");
-const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 const app = express();
 require("dotenv").config();
 const cors = require("cors");
-const { ObjectId } = require("mongodb");
 app.use(bodyParser.json());
 const apiRoutes = require("./routes/api");
 const { getConnection, connectDB } = require("./config/db.config");

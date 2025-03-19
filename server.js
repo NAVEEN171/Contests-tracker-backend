@@ -13,6 +13,15 @@ app.get("/", (req, res) => {
   res.json("deployed succesfully");
 });
 
+app.use(
+  cors({
+    origin: ["http://localhost:5173", "https://contests-tracker-nu.vercel.app"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+
 app.use("/api", apiRoutes);
 
 const connection = connectDB();

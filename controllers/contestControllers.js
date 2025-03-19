@@ -199,7 +199,7 @@ const getContests = async (req, res, next) => {
       },
     });
 
-    const results = await Contests.aggregate(pipeline).allowDiskUse(true);
+    const results = await Contests.aggregate(pipeline, { allowDiskUse: true });
 
     if (results.length > 0) {
       let maxPages = results[0].totalCount;

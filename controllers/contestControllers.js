@@ -5,7 +5,9 @@ const getSavedContests = async (req, res) => {
   try {
     const { contestIds } = req.body;
 
-    const db = getConnection().useDb("coding-contests");
+    const dbConn = await getConnection();
+
+    const db = dbConn.useDb("coding-contests");
     const Contests = db.collection("Contests");
     if (!contestIds || !Array.isArray(contestIds) || contestIds.length === 0) {
       return res.status(400).json({
@@ -50,8 +52,9 @@ const getSolutions = async (req, res, next) => {
         message: "Invalid contest ID format",
       });
     }
+    const dbConn = await getConnection();
 
-    const db = getConnection().useDb("coding-contests");
+    const db = dbConn.useDb("coding-contests");
     const Contests = db.collection("Contests");
 
     let existingContest = await Contests.findOne({
@@ -79,7 +82,9 @@ const getSolutions = async (req, res, next) => {
 
 const getContests = async (req, res, next) => {
   try {
-    const db = getConnection().useDb("coding-contests");
+    const dbConn = await getConnection();
+
+    const db = dbConn.useDb("coding-contests");
 
     const Contests = db.collection("Contests");
     const params = req.query;

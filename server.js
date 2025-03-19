@@ -22,7 +22,17 @@ app.get("/", (req, res) => {
 
 app.use("/api", apiRoutes);
 
-const connection = connectDB();
+// Connect to MongoDB before starting the server
+const startServer = async () => {
+  try {
+    await connectDB(); // Await the connection to ensure it's established
+    console.log("Database connected successfully");
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+  }
+};
+
+startServer();
 
 // Server Start
 const PORT = process.env.PORT || 5000;

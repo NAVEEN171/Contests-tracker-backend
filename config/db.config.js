@@ -1,58 +1,44 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
-// Cache the connection object (not just the connection instance)
 let cachedConnection = null;
 
 const connectDB = async () => {
-  if (cachedConnection) {
-    console.log("Using cached connection");
+  // If there is already a cached connection and it's active, reuse it
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    console.log("Using existing connection");
     return cachedConnection;
   }
 
   try {
-    // Explicitly create a new connection instead of using default
-    const conn = await mongoose.createConnection(process.env.MONGO_DB_URL, {
-      serverSelectionTimeoutMS: 30000, // 30 seconds (more conservative)
-      socketTimeoutMS: 60000, // 60 seconds
-      maxPoolSize: 10, // Recommended for production
-      minPoolSize: 2,
+    const conn = await mongoose.connect(process.env.MONGO_DB_URL, {
+      bufferCommands: true, // Enable command buffering
+      serverSelectionTimeoutMS: 30000, // Timeout for server selection
+      socketTimeoutMS: 60000, // Timeout for socket operations
+      maxPoolSize: 10, // Maximum number of connections in the pool
+      minPoolSize: 2, // Minimum number of connections in the pool
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      bufferCommands: false, // Critical for preventing buffering issues
     });
 
     console.log("MongoDB Connected");
-
-    // Cache the entire connection object
-    cachedConnection = conn;
-
-    // Add error handling for connection drops
-    conn.on("error", (err) => {
-      console.error("MongoDB connection error:", err);
-      cachedConnection = null; // Reset cache on error
-    });
-
-    return conn;
+    cachedConnection = conn.connection; // Cache the connection object
+    return cachedConnection;
   } catch (err) {
     console.error("MongoDB Connection Error:", err);
-    cachedConnection = null; // Ensure cache is cleared on failure
     throw err; // Propagate error for proper handling
   }
 };
 
 const getConnection = async () => {
-  if (!cachedConnection) {
-    cachedConnection = await connectDB();
+  // Check if there is an existing cached connection and it's active
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    console.log("Using cached connection");
+    return cachedConnection;
   }
 
-  if (cachedConnection.readyState !== 1) {
-    console.log("Reconnecting...");
-    cachedConnection = null;
-    cachedConnection = await connectDB();
-  }
-
-  return cachedConnection;
+  console.log("Creating new connection");
+  return await connectDB(); // Establish a new connection if needed
 };
 
 module.exports = {

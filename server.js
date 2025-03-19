@@ -22,7 +22,7 @@ app.get("/", (req, res) => {
 
 app.use("/api", apiRoutes);
 
-const connection = await connectDB();
+const connection = connectDB();
 
 // Server Start
 const PORT = process.env.PORT || 5000;

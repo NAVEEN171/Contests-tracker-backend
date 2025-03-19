@@ -1,23 +1,41 @@
 const mongoose = require("mongoose");
 require("dotenv").config();
 
+let cachedConnection = null;
+
 const connectDB = async () => {
+  if (cachedConnection && mongoose.connection.readyState === 1) {
+    console.log("Using existing connection");
+    return cachedConnection;
+  }
+
   try {
-    await mongoose.connect(process.env.MONGO_DB_URL, {
+    const conn = await mongoose.connect(process.env.MONGO_DB_URL, {
       w: "majority",
-      serverSelectionTimeoutMS: 15000, // Increase timeout to 15 seconds
-      socketTimeoutMS: 45000, // Increase socket timeout
-      connectTimeoutMS: 15000, // Increase connection timeout
-      maxPoolSize: 10, // For serverless, keep pool size modest
+      serverSelectionTimeoutMS: 15000,
+      socketTimeoutMS: 45000,
+      connectTimeoutMS: 15000,
+      maxPoolSize: 10,
       minPoolSize: 0,
     });
+
     console.log("MongoDB Connected");
+    cachedConnection = conn.connection;
+    return cachedConnection;
   } catch (err) {
     console.error("MongoDB Connection Error:", err);
-    process.exit(1);
+    throw err;
   }
 };
 
-const getConnection = () => mongoose.connection;
+const getConnection = async () => {
+  if (!cachedConnection || mongoose.connection.readyState !== 1) {
+    await connectDB();
+  }
+  return cachedConnection || mongoose.connection;
+};
 
-module.exports = { connectDB, getConnection };
+module.exports = {
+  connectDB,
+  getConnection,
+};
